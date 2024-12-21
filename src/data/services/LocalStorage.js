@@ -31,5 +31,27 @@ export const LocalStorage = {
         resolve();
       })
     });
-  }
-}
+  },
+
+  removeTodoItemFromLocalStorage: (id) => {
+    return new Promise((resolve, reject) => {
+      LocalStorage.getTodoItemsFromLocalStorage().then((todoItems) => {
+        const newTodoItems = todoItems.filter(item => item.id !== id);
+        localStorage.setItem(TODO_ITEMS_LOCAL_STORAGE_KEY, JSON.stringify(newTodoItems));
+        resolve();
+      });
+    });
+  },
+
+  updateTodoItemInLocalStorage: (id, updates) => {
+    return new Promise((resolve, reject) => {
+      LocalStorage.getTodoItemsFromLocalStorage().then((todoItems) => {
+        const updatedItems = todoItems.map((item) =>
+          item.id === id ? { ...item, ...updates } : item
+        );
+        localStorage.setItem(TODO_ITEMS_LOCAL_STORAGE_KEY, JSON.stringify(updatedItems));
+        resolve();
+      });
+    });
+  },  
+}  

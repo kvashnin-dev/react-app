@@ -1,44 +1,66 @@
-import React, {useState} from 'react';
-import {TodoItemsContainer} from './TodoItemsContainer';
-import {NewTodoItem} from '../TodoItem/NewTodoItem';
-import {TodoItem} from '../TodoItem/TodoItem';
-import {useData} from '../../data/hooks/useData';
-import {SearchInput} from './components/SearchInput';
+import React, { useState } from 'react';
+import { TodoItemsContainer } from './TodoItemsContainer';
+import { NewTodoItem } from '../TodoItem/NewTodoItem';
+import { TodoItem } from '../TodoItem/TodoItem';
+import { useData } from '../../data/hooks/useData';
+import { SearchInput } from './components/SearchInput';
+import styled from 'styled-components';
+
+const SortButton = styled.button`
+  padding: 8px 16px;
+  background-color: #007BFF;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 16px;
+
+  &:hover {
+    background-color: #0056b3;
+  }
+`;
 
 export const TodoItems = () => {
   const [searchValue, setSearchValue] = useState('');
-
-  const {data: todoItems, isLoading} = useData();
+  const [isSorted, setIsSorted] = useState(false);
+  const { data: todoItems, isLoading } = useData();
 
   if (!todoItems || isLoading) {
-    return (
-      <TodoItemsContainer>
-        Загрузка данных...
-      </TodoItemsContainer>
-    );
+    return <TodoItemsContainer>Загрузка данных...</TodoItemsContainer>;
   }
 
-  // Фукнция filter вызывает для каждого элемента переданный ей колбек
-  // И формирует в filteredBySearchItems новый массив элементов, для которых колбек вернул true
-  // Для проверки вхождения подстроки в строку нужно использовать indexOf
-  const filteredBySearchItems = todoItems.filter((todoItem) => {
-    // const clearedTodoItemTitle = очистка от пробелов + приведение к одному из регистров
-    // const clearedSearchValue = очистка от пробелов + приведение к одному из регистров
-    // const isSearched = проверка вхождения строки поиска в строку заголовка
-    // return isSearched
-    return true; // удалить после реализации фильтрации
-  })
-
-
-  const todoItemsElements = filteredBySearchItems.map((item, index) => {
-    return <TodoItem key={item.id} title={item.title} checked={item.isDone} />;
+  const sortedTodoItems = [...todoItems].sort((a, b) => {
+    if (!isSorted) return 0;
+    const priorityOrder = { high: 3, medium: 2, low: 1 };
+    return (priorityOrder[b.priority] || 0) - (priorityOrder[a.priority] || 0);
   });
+
+  const filteredBySearchItems = sortedTodoItems.filter((todoItem) => {
+    const clearedTodoItemTitle = todoItem.title.trim().toLowerCase();
+    const clearedSearchValue = searchValue.trim().toLowerCase();
+    return clearedTodoItemTitle.includes(clearedSearchValue);
+  });
+
+  const todoItemsElements = filteredBySearchItems.map((item) => (
+    <TodoItem
+      key={item.id}
+      id={item.id}
+      title={item.title}
+      checked={item.isDone}
+      priority={item.priority}
+    />
+  ));
+
+  const toggleSort = () => setIsSorted(!isSorted);
 
   return (
     <TodoItemsContainer>
-      <SearchInput value={searchValue} />
+      <SortButton onClick={toggleSort}>
+        {isSorted ? 'Отключить сортировку' : 'Сортировать по приоритету'}
+      </SortButton>
+      <SearchInput value={searchValue} setValue={setSearchValue} />
       {todoItemsElements}
       <NewTodoItem />
     </TodoItemsContainer>
-  )
-}
+  );
+};
