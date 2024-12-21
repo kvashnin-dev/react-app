@@ -1,16 +1,28 @@
 import React from 'react';
-import {styled} from 'styled-components';
+import styled from 'styled-components';
 
+const Input = styled.input`
+  padding: 8px;
+  margin-bottom: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+`;
 
-const Input = styled.input``;
-
-// Разобраться, почему не срабатывает ввод символов в строку
-export const SearchInput = ({value, setValue}) => {
+export const SearchInput = ({ value, setValue }) => {
   const onInputChange = (event) => {
-    if (setValue) { 
-      setValue(event.nativeEvent.target.value);
+    if (setValue) {
+      setValue(event.target.value);
     }
-  }
+  };
 
-  return <Input value={value} onChange={onInputChange} placeholder='Поиск' />
-}
+  return (
+    <Input
+      type="text"
+      value={value}
+      onChange={onInputChange}
+      placeholder="Поиск..."
+    />
+  );
+};

@@ -1,32 +1,43 @@
-import styled, {css} from "styled-components";
+import styled, { css } from 'styled-components';
 
 const disabledCss = css`
-  background-color: #E2E2E2;
+  background-color: #e2e2e2;
   border-width: 0px;
-`
+  cursor: not-allowed;
+`;
 
 const checkedCss = css`
-  border-color: #B5B5BA;
-  background-color: #B5B5BA;
+  border-color: #b5b5ba;
+  background-color: #b5b5ba;
   background-image: url(assets/images/svg/todo-done.svg);
   background-position: center;
   background-repeat: no-repeat;
-`
+  background-size: 12px;
+`;
 
-export const CheckboxContainer = styled.span(props => {
-  return `
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 2px solid #C4C4C4;
-    border-radius: 6px;
-    cursor: pointer;
-    ${props.disabled ? disabledCss : ''}
-    ${props.checked ? checkedCss : ''}
-  `;
-});
+export const CheckboxContainer = styled.span`
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #c4c4c4;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  ${({ disabled }) => (disabled ? disabledCss : '')};
+  ${({ checked }) => (checked ? checkedCss : '')};
 
+  &:hover {
+    border-color: ${({ disabled, checked }) =>
+      !disabled && !checked ? '#888888' : ''};
+  }
+`;
 
-export const TodoItemCheckbox = ({disabled, checked}) => {
-  return <CheckboxContainer disabled={disabled} checked={checked} />
-}
+export const TodoItemCheckbox = ({ disabled, checked, onClick }) => {
+  const handleClick = () => {
+    if (!disabled && onClick) {
+      onClick();
+    }
+  };
+
+  return <CheckboxContainer disabled={disabled} checked={checked} onClick={handleClick} />;
+};
